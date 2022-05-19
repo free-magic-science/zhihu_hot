@@ -14,7 +14,7 @@ import traceback
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy.exceptions import DropItem
 import scrapy 
-from scrapy.utils.project import get_project_settings
+#from scrapy.utils.project import get_project_settings
 
 class ZhihuhotPipeline:
     
@@ -37,7 +37,7 @@ class ZhihuhotPipeline:
         hot = item['hot'] #str
         tags = item['tags'] #[ *, *, *, *, ]
         get_time=item['get_time']#str
-        question_url=item['question_url']#str 放到问题正文表
+        question_url=item['question_url']#str 放到问题正文_问题链接
         answer_content = item['answer_content'] # [] -> {} str
         for an in answer_content:
             answer_contentmd5_list.append(an['answer_contentmd5'])
