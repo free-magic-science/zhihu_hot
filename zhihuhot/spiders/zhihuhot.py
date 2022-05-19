@@ -7,6 +7,7 @@ from lxml import etree
 import html
 import hashlib
 import datetime
+import errlog 
 
 class GetInfo(scrapy.Spider):
     name = 'zhihuhot'
@@ -31,6 +32,11 @@ class GetInfo(scrapy.Spider):
             item['hot']=text.xpath(".//div[contains(@class,'HotList-itemMetrics')]//text()").get()
             items.append(item)
         errs=0
+        
+        ertime=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        parseerrlog= errlog.errgo("parseerrlog")
+        parseerrlog.errrun("scrapy 获取 的时间和数量 " +ertime + " : " + str(len(items)))
+
         for itemdit in items:
             conselenium.getwait("//*")
             getsurl = conselenium.driver.current_url
@@ -44,9 +50,23 @@ class GetInfo(scrapy.Spider):
                 if getsurl.replace(" ","").replace("/","").replace("https","").replace("http","")== response.url.replace(" ","").replace("/","").replace("https","").replace("http",""):
                     print(getsurl)
                 else:
+                    parseerrlog.errrun("scrapy 链接无法对上 " +ertime + " : " + str(len(items)))
                     continue
             try:
                 conselenium.getwait("//*")
+                try:
+                    js = '''window.scrollTo({
+                            top: document.body.scrollHeight
+                            });
+                        '''
+                    #js = "window.scrollTo(0,document.body.scrollHeight)"
+                    conselenium.driver.execute_script(js)
+                    print("滑动页面")
+                    time.sleep(1)
+                except Exception as e:
+                    print(traceback.format_exc())
+                    print("无法滑动 or 滑动页面出错--")
+                    time.sleep(1)
                 conselenium.driver.find_element_by_xpath("//div[contains(@class,'HotList-itemTitle') and text()='{0}']".format(itemdit['question'])).click()
                 time.sleep(1)
                 try:
@@ -55,7 +75,9 @@ class GetInfo(scrapy.Spider):
                     time.sleep(1)
                     # print("等待成功")
                 except:
-                    print("等待失败 -> //h1[@class='QuestionHeader-title' and text()")
+                    parseerrlog.errrun("等待失败 -> //h1[@class='QuestionHeader-title' and text()" +ertime + " : " + str(len(items)))
+                    conselenium.driver.back()
+                    #print("等待失败 -> //h1[@class='QuestionHeader-title' and text()")
                     continue
                 conselenium.getwait("//button[@aria-label='关闭' and contains(@class,'Modal-closeButton')]")
                 time.sleep(1)
@@ -82,7 +104,11 @@ class GetInfo(scrapy.Spider):
                 if errs >=5:
                     #应该记录log
                     print("出错过多")
+                    parseerrlog.errrun("出错过多无法找到这个问题可能更新了" +ertime + " : " + str(len(items)))
+                    conselenium.driver.quit()
                     break
+                parseerrlog.errrun("无法找到这个问题可能更新了" +ertime + " : " + str(len(items)))
+                conselenium.driver.back()
                 continue
             
             #把html提取出来
