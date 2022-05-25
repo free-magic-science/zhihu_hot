@@ -11,44 +11,58 @@
 import psycopg2
 import datetime
 import traceback
+# from pymysql import TIME
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy.exceptions import DropItem
 import scrapy 
-#from scrapy.utils.project import get_project_settings
+# from scrapy.utils.project import get_project_settings
+# import time
+import hashlib
 
 class ZhihuhotPipeline:
     
     def open_spider(self,spider):
         try:
-            self.conn = psycopg2.connect(database="zhihuhot",user="zhihuhot",password="数据库密码",host="127.0.0.1",port="5432")
+            self.conn = psycopg2.connect(database="zhihuhot",user="zhihuhot",password="***",host="0.0.0.0",port="5432")
             self.cur  = self.conn.cursor()
-            # print("登录成功了")
+            print("登录成功了--------------------------------------------------------------------------------------------------------------------")
+            # time.sleep(30)
         except Exception as e:
             print(traceback.format_exc())
-            # erlog="数据库登录失败"
+            erlog="数据库登录失败"
+            print(erlog)
+            # time.sleep(3)
 
     def process_item(self, item, spider):
         # print("输入数据库")
+        # 取数据
         answer_contentmd5_list=[]
         hot_number=item['hot_number'] #str 
         question=item['question'] #str
-
-        # 取数据
         hot = item['hot'] #str
         tags = item['tags'] #[ *, *, *, *, ]
         get_time=item['get_time']#str
-        question_url=item['question_url']#str 放到问题正文_问题链接
+        question_url=item['question_url']#str 放到问题正文表
         answer_content = item['answer_content'] # [] -> {} str
         for an in answer_content:
             answer_contentmd5_list.append(an['answer_contentmd5'])
         try:
-            self.cur.execute("INSERT INTO questions(hot_number,question,hot,get_time,answer_contentmd5_list)\
-                VALUES(%s,%s,%s,%s,%s)",           [hot_number,question,hot,get_time,answer_contentmd5_list])
-            self.conn.commit()
-        except Exception as e: 
-            self.conn.rollback()
+            self.cur.execute("SELECT get_time FROM questions where get_time like '{0}' and hot_number='{1}'".format(get_time[:14]+'%',hot_number))
+            print(self.cur.fetchone())
+            if self.cur.rowcount==0:
+                self.conn.commit() 
+                try:
+                    self.cur.execute("INSERT INTO questions(hot_number,question,hot,get_time,answer_contentmd5_list)\
+                        VALUES(%s,%s,%s,%s,%s)",           [hot_number,question,hot,get_time,answer_contentmd5_list])
+                    self.conn.commit()
+                except Exception as e: 
+                    self.conn.rollback()
+                    print(traceback.format_exc())
+            else:
+                self.conn.commit()
+        except Exception as e:
             print(traceback.format_exc())
-
+        
         for da in answer_content:
             try:
                 # 查询是否已存在
@@ -110,3 +124,12 @@ class ZhiHuiHotImgsline(ImagesPipeline):
         iamges_type='jpg'
         image_name = u'{0}.{1}'.format(nameurl,iamges_type)
         return image_name
+
+
+def tomd5(text):
+    # md5
+    if isinstance(text, str):
+        text=text.encode("utf-8")
+    m = hashlib.md5()
+    m.update(text)
+    return m.hexdigest()
