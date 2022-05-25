@@ -9,4 +9,4 @@
 开发的时候是在Ubuntu下测试的 , 如果是在windowns 使用可能需要调整 , 使用postgersql , 如果图片没有下载应该要注意是否安装pillow , 要注意浏览器版本和浏览器驱动版本是否匹配 , 
 selenium驱动: https://registry.npmmirror.com/binary.html?path=chromedriver/
 改了一下防止浏览器引发崩溃,
-增加了docker打包->  (grawlab_docker)
+增加了docker打包->  (docker_grawlab)
