@@ -9,4 +9,4 @@
 开发的时候是在Ubuntu下测试的 , 如果是在windowns 使用可能需要调整 , 使用postgersql , 如果图片没有下载应该要注意是否安装pillow , 要注意浏览器版本和浏览器驱动版本是否匹配 , 
 selenium驱动: https://registry.npmmirror.com/binary.html?path=chromedriver/
 改了一下防止浏览器引发崩溃,
-增加了docker打包->  (grawlab_docker)
+增加了docker打包->  (grawlab_docker) requirements.txt里面是docker需要安装的依赖 , crawlab upload时和其他文件一同上传会自动安装依赖, docker里面登录数据库如果不能登录可以尝试指定服务器本机的IP , docker-compose.yml是启动docker时的配置运行docker-compose up -d 时放在运行目录即可,
