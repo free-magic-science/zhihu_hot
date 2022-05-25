@@ -42,11 +42,20 @@ class ZhihuhotPipeline:
         for an in answer_content:
             answer_contentmd5_list.append(an['answer_contentmd5'])
         try:
-            self.cur.execute("INSERT INTO questions(hot_number,question,hot,get_time,answer_contentmd5_list)\
-                VALUES(%s,%s,%s,%s,%s)",           [hot_number,question,hot,get_time,answer_contentmd5_list])
-            self.conn.commit()
-        except Exception as e: 
-            self.conn.rollback()
+            self.cur.execute("SELECT get_time FROM questions where get_time like '{0}' and hot_number='{1}'".format(get_time[:14]+'%',hot_number))
+            print(self.cur.fetchone())
+            if self.cur.rowcount==0:
+                self.conn.commit() 
+                try:
+                    self.cur.execute("INSERT INTO questions(hot_number,question,hot,get_time,answer_contentmd5_list)\
+                        VALUES(%s,%s,%s,%s,%s)",           [hot_number,question,hot,get_time,answer_contentmd5_list])
+                    self.conn.commit()
+                except Exception as e: 
+                    self.conn.rollback()
+                    print(traceback.format_exc())
+            else:
+                self.conn.commit()
+        except Exception as e:
             print(traceback.format_exc())
 
         for da in answer_content:
