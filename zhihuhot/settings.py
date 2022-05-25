@@ -79,7 +79,8 @@ DEFAULT_REQUEST_HEADERS = {
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
 'zhihuhot.pipelines.ZhihuhotPipeline': 300,  #这个是管道启动顺序数值越小优先启动
-'zhihuhot.pipelines.ZhiHuiHotImgsline': 301,
+# 'zhihuhot.pipelines.ZhiHuiHotImgsline': 301,
+# 'crawlab.pipelines.CrawlabMongoPipeline': 302,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
