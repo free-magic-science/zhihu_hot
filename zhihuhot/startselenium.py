@@ -6,8 +6,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 import traceback
 import time
-import errlog
-from multiprocessing.managers import BaseManager
+import zhihuhot.errlog as errlog
+# from multiprocessing.managers import BaseManager
 
 
 class seleniumstart():
@@ -33,11 +33,11 @@ class seleniumstart():
                 self.chrome_options.add_argument('--headless')  # 使用无头谷歌浏览器模式
                 self.chrome_options.add_argument('--disable-gpu')#禁用gpu加速
                 self.chrome_options.add_argument('--no-sandbox')#no沙盒模式
-            try:
-                self.chrome_options.binary_location=self.chromepath + "google-chrome" #浏览器位置
-            except Exception as e:
-                print(traceback.format_exc())
-                self.errlog.errrun("请正确填写浏览路径")
+            # try:
+                # self.chrome_options.binary_location=self.chromepath + "google-chrome" #浏览器位置
+            # except Exception as e:
+                # print(traceback.format_exc())
+                # self.errlog.errrun("请正确填写浏览路径")
             #模拟真实浏览器 ,
             self.chrome_options.add_experimental_option('excludeSwitches',['enable-automation']) #以开发者模式启动调试chrome，
             self.chrome_options.add_experimental_option("useAutomationExtension", False) #去掉开发者模式提示
@@ -49,7 +49,7 @@ class seleniumstart():
             self.chrome_options.page_load_strategy="eager"
             #懒加载不等待页面加载(可设置项DOMContentLoaded 'eager',load 'normal',none 'none')
 
-            self.driver = webdriver.Chrome(options=self.chrome_options,executable_path=self.chromepath+"chromedriver")
+            self.driver = webdriver.Chrome(options=self.chrome_options,)#executable_path=self.chromepath+"chromedriver")
             self.driver.set_page_load_timeout(15)#设置加载超时
             self.driver.execute_cdp_cmd("Network.enable", {})
             self.driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {"headers": {"User-Agent": "browserClientA"}})
@@ -174,10 +174,10 @@ class seleniumstart():
                 print(traceback.format_exc())
                 return False
 
-class RobotManager(BaseManager):
+# class RobotManager(BaseManager):
     # 远程函数申请类变量,
-    pass
-
+    # pass
+# 
 if __name__ == '__main__':
     print("test???????????")
     
